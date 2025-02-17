@@ -1,13 +1,12 @@
 export default class NotificationMessage {
   static instObj;
   element = document.createElement('div');
-  get duration() {
-    const str = this.element.style.getPropertyValue('--value');
-    return Number(str.substring(0, str.length - 2));
-  }
+  duration = 0;
+  timeOutID;
   
   constructor(message, options) {
-    this.element.style.setProperty('--value', String(options?.duration) + 'ms');
+    this.duration = options?.duration;
+    this.element.style.setProperty('--value', String(this.duration) + 'ms');
     this.element.className = 'notification ' + options?.type;
     this.element.innerHTML = `
     <div class="timer"></div>
@@ -20,19 +19,20 @@ export default class NotificationMessage {
     `;
   }
 
-  show(div = {append: () => void (0)}) {
+  show(div) {
     if (NotificationMessage.instObj) {
       NotificationMessage.instObj.remove();
     }
     NotificationMessage.instObj = this;
-    document.body.append(this.element);
-    if (typeof process === "object" && typeof require === "function") {
-      setTimeout(() => this.remove(), 0);
+    if (div) {
+      div.append(this.element);
     }
     else {
-      this.element.addEventListener('animationend', () => this.remove());
+      document.body.append(this.element);
     }
-    div.append(this.element);
+    //this.element.addEventListener('animationend', () => this.remove()); ???
+    this.timeOutID = setTimeout(() => this.remove(), this.duration);
+    
   }
 
   remove() {
@@ -41,7 +41,8 @@ export default class NotificationMessage {
   }
 
   destroy() {
-    this.element.removeEventListener('animationend', () => this.remove());
+    //this.element.removeEventListener('animationend', () => this.remove());
+    clearTimeout(this.timeOutID);
     this.remove();
   }
 }
