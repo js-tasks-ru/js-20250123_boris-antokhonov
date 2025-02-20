@@ -1,8 +1,12 @@
 export default class SortableTable {
   element = document.createElement('div');
+  dataProp = [];
+  headConfProp = [];
   theader = {};
   tbody = {};
   constructor(headerConfig = [], data = []) {
+    this.headConfProp = headerConfig;
+    this.dataProp = data;
     this.element.dataset.element = 'productsContainer';
     this.element.className = 'products-list__container';
     this.element.innerHTML = `
@@ -23,7 +27,7 @@ export default class SortableTable {
     this.theader = this.element.querySelector('[data-element=\'header\']');
     this.tbody = this.element.querySelector('[data-element=\'body\']');
 
-    headerConfig.forEach((obj) => {
+    this.headConfProp.forEach((obj) => {
       const headCell = document.createElement('div');
       headCell.className = 'sortable-table__cell';
       headCell.dataset.id = obj.id;
@@ -33,27 +37,74 @@ export default class SortableTable {
       this.theader.append(headCell);
     });
 
-    this.headArray = Array.from(this.theader.children);
-
-    data.forEach((obj) => {
+    this.constructBody();
+  }
+  
+  constructBody () {
+    this.dataProp.forEach((obj) => {
       const dataRow = document.createElement('a');
       dataRow.setAttribute('href', '/product/' + obj.id);
       dataRow.className = 'sortable-table__row';
-      for (let i = 0; i < this.headArray.length; i++) {
+      for (let i = 0; i < this.headConfProp.length; i++) {
         let rowCell = {};
-        if (this.headArray[i].dataset.id === 'images') {
+        if (this.headConfProp[i].id === 'images') {
           const tmpl = document.createElement('template');
-          tmpl.innerHTML = headerConfig[i].template(obj.images);
+          tmpl.innerHTML = this.headConfProp[i].template(obj.images);
           rowCell = tmpl.content.firstElementChild;
         }
         else {
           rowCell = document.createElement('div');          
           rowCell.className = 'sortable-table__cell';
-          rowCell.textContent = obj[this.headArray[i].dataset.id];
+          rowCell.textContent = obj[this.headConfProp[i].id];
         }
         dataRow.append(rowCell);
       }
       this.tbody.append(dataRow);
     });
+  }
+
+  sort(col, order = 'asc') {
+    const head = this.headConfProp.find((el) => el.id === col);
+    const colType = head.sortType;
+    const colSortFlg = head.sortable;
+
+    if (colSortFlg === false) {
+      return void (0);
+    }
+    else if (colType === 'string') {
+      this.dataProp.sort((next, prev) => {
+        return order == 'asc' ? 
+          next[col].localeCompare(prev[col], ['ru', 'en'], {sensitivity: 'variant', caseFirst: 'upper'}) :
+          prev[col].localeCompare(next[col], ['ru', 'en'], {sensitivity: 'variant', caseFirst: 'upper'});
+      });
+    }
+    else if (colType === 'number') {
+      this.dataProp.sort((next, prev) => {
+        return order == 'asc' ? 
+          next[col] - prev[col] :
+          prev[col] - next[col];
+      });
+    }
+    else if (colType === 'date') {
+      this.dataProp.sort((next, prev) => {
+        return order == 'asc' ?
+          new Date(next[col]) > new Date(prev[col]) :
+          new Date(prev[col]) > new Date(next[col]);
+      });
+    }
+    else {
+      return void (0);
+    }
+
+    this.tbody.innerHTML = ''; //delete rows
+    this.constructBody(); 
+  }
+
+  get subElements() {
+    return {body: this.tbody};
+  }
+
+  destroy() {
+    this.element.remove();
   }
 }
