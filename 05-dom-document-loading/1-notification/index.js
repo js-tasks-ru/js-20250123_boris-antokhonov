@@ -30,19 +30,17 @@ export default class NotificationMessage {
     else {
       document.body.append(this.element);
     }
-    //this.element.addEventListener('animationend', () => this.remove()); ???
     this.timeOutID = setTimeout(() => this.remove(), this.duration);
     
   }
 
   remove() {
     this.element.remove();
-    NotificationMessage.instObj = undefined;
   }
 
   destroy() {
-    //this.element.removeEventListener('animationend', () => this.remove());
     clearTimeout(this.timeOutID);
     this.remove();
+    NotificationMessage.instObj = undefined;
   }
 }
