@@ -19,19 +19,13 @@ export default class NotificationMessage {
     `;
   }
 
-  show(div) {
+  show(el = document.body) {
     if (NotificationMessage.instObj) {
       NotificationMessage.instObj.remove();
     }
     NotificationMessage.instObj = this;
-    if (div) {
-      div.append(this.element);
-    }
-    else {
-      document.body.append(this.element);
-    }
-    this.timeOutID = setTimeout(() => this.remove(), this.duration);
-    
+    el.append(this.element);
+    this.timeOutID = setTimeout(() => this.remove(), this.duration);    
   }
 
   remove() {
