@@ -13,7 +13,7 @@ export default class SortableTable extends SortableTablev1 {
 
     this.sortableArr = this.element.querySelectorAll('[data-sortable=\'true\']');
     this.sortableArr.forEach(function(el) {
-      el.addEventListener('click', this.handleClickThis);
+      el.addEventListener('pointerdown', this.handleClickThis);
     }, this);
   }
 
@@ -28,7 +28,7 @@ export default class SortableTable extends SortableTablev1 {
   }  
 
   handleClickThis = function(e) {
-    this.sort(e.currentTarget.dataset.id, e.currentTarget.dataset.order === 'asc' ? 'desc' : 'asc');
+    this.sort(e.currentTarget.dataset.id, e.currentTarget.dataset.order === 'desc' ? 'asc' : 'desc');
   }.bind(this);
 
   sort(col, order = 'asc') {
@@ -49,7 +49,7 @@ export default class SortableTable extends SortableTablev1 {
 
   destroy() {
     this.sortableArr.forEach(function(el) {
-      el.removeEventListener('click', this.handleClickThis);
+      el.removeEventListener('pointerdown', this.handleClickThis);
     }, this);
     super.destroy();
   }
