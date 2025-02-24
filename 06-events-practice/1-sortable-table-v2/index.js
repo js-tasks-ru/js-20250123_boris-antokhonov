@@ -13,7 +13,7 @@ export default class SortableTable extends SortableTablev1 {
 
     this.sortableArr = this.element.querySelectorAll('[data-sortable=\'true\']');
     this.sortableArr.forEach(function(el) {
-      el.addEventListener('pointerdown', this.handleClickThis);
+      el.addEventListener('pointerdown', (e) => {this.sort(e.currentTarget.dataset.id, e.currentTarget.dataset.order === 'desc' ? 'asc' : 'desc');});
     }, this);
   }
 
@@ -26,10 +26,6 @@ export default class SortableTable extends SortableTablev1 {
     `;
     return el.firstElementChild;
   }  
-
-  handleClickThis = function(e) {
-    this.sort(e.currentTarget.dataset.id, e.currentTarget.dataset.order === 'desc' ? 'asc' : 'desc');
-  }.bind(this);
 
   sort(col, order = 'asc') {
     if (this.isSortLocally) {
@@ -49,7 +45,7 @@ export default class SortableTable extends SortableTablev1 {
 
   destroy() {
     this.sortableArr.forEach(function(el) {
-      el.removeEventListener('pointerdown', this.handleClickThis);
+      el.removeEventListener('pointerdown', (e) => {this.sort(e.currentTarget.dataset.id, e.currentTarget.dataset.order === 'desc' ? 'asc' : 'desc');});
     }, this);
     super.destroy();
   }
