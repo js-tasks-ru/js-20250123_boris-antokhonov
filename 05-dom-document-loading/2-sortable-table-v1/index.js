@@ -101,7 +101,7 @@ export default class SortableTable {
   }
 
   get subElements() {
-    return {body: this.tbody};
+    return {header: this.theader, body: this.tbody};
   }
 
   destroy() {
