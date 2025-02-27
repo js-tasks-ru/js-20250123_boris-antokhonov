@@ -1,4 +1,4 @@
-import {default as SortableTablev1} from '../../05-dom-document-loading/2-sortable-table-v1/index.js';
+import SortableTablev1 from '../../05-dom-document-loading/2-sortable-table-v1/index.js';
 
 export default class SortableTable extends SortableTablev1 {
   sortableArr = [];
@@ -13,7 +13,7 @@ export default class SortableTable extends SortableTablev1 {
 
     this.sortableArr = this.element.querySelectorAll('[data-sortable=\'true\']');
     this.sortableArr.forEach(function(el) {
-      el.addEventListener('pointerdown', (e) => {this.sort(e.currentTarget.dataset.id, e.currentTarget.dataset.order === 'desc' ? 'asc' : 'desc');});
+      el.addEventListener('pointerdown', this.sortHandler);
     }, this);
   }
 
@@ -43,9 +43,13 @@ export default class SortableTable extends SortableTablev1 {
   
   sortOnServer() {}
 
+  sortHandler = function(e) {
+    this.sort(e.currentTarget.dataset.id, e.currentTarget.dataset.order === 'desc' ? 'asc' : 'desc');
+  }.bind(this);
+
   destroy() {
     this.sortableArr.forEach(function(el) {
-      el.removeEventListener('pointerdown', (e) => {this.sort(e.currentTarget.dataset.id, e.currentTarget.dataset.order === 'desc' ? 'asc' : 'desc');});
+      el.removeEventListener('pointerdown', this.sortHandler);
     }, this);
     super.destroy();
   }
