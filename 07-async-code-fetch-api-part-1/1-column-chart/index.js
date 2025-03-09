@@ -5,42 +5,41 @@ const BACKEND_URL = 'https://course-js.javascript.ru';
 
 export default class ColumnChart extends ColumntChartv1 {
   label;
+  get subElements() {
+    return {
+      header: this.element.querySelector("[data-element='header']"),
+      body: this.element.querySelector("[data-element='body']")
+    };
+  }
+
   constructor(options) {
     super(options);
-    this.element.innerHTML = this.element.querySelector('[class=\'column-chart\'').outerHTML; //bandaid
-    this.url = options.url;
-    this.label = options.label;
+    this.url = options?.url;
+    this.label = options?.label;
     this.getData(options).
-    then((resp) => resp.json()).
-    then((dataObj) => this.update('', '', Object.values(dataObj)));
-      
-
-
+    then((dataObj) => this.update('', '', Object.values(dataObj))); 
   }
 
-  getData (options) {
+  async getData (options) {
     const fullURL = new URL(options.url, BACKEND_URL);
-    fullURL.searchParams.append('from', options.range.from.toJSON());
-    fullURL.searchParams.append('to', options.range.to.toJSON());
-    return fetch(fullURL, {method: 'GET'});
+    fullURL.searchParams.append('from', options.range?.from.toJSON());
+    fullURL.searchParams.append('to', options.range?.to.toJSON());
+    const resp = await fetch(fullURL.toString(), {method: 'GET'});
+    return await resp.json();
   }
 
-  update(from, to, newdata) {
+  async update(from, to, newdata) {
     if (newdata === undefined) {  
-      this.getData({
-        url: this.url, range: {from: from, to: to}
-      }).
-          then((resp) => resp.json()).
-          then((dataObj) => super.update('', '', Object.values(dataObj)));
+      newdata = await this.getData({url: this.url, range: {from: from, to: to}});
+      super.update(Object.values(newdata));
     }
     else {
       super.update(newdata);
     }
-    this.element.innerHTML = this.element.querySelector('[class=\'column-chart\'').outerHTML; //bandaid
-    this.element.className = '';
-    document.getElementById(this.label).append(this.element);
-    
+    return newdata;
   }
+
+
 
 
 }

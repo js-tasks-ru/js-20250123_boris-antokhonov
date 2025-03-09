@@ -18,10 +18,7 @@ export default class ColumnChart {
     }
 
     constructor(options) {
-      this.data = options?.data ? options.data : this.data;      
-      //this.maxHeight = Math.max(...this.data);
-      //this.colHgtUnit = this.chartHeight / this.maxHeight;
-
+      this.data = options?.data ? options.data : this.data;
       this.render(options);    
     }
 
@@ -59,7 +56,6 @@ export default class ColumnChart {
     }
       
     update(newdata) {
-      this.destroy();
       this.data = newdata;
       this.render();    
     }
