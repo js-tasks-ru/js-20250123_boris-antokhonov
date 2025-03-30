@@ -2,17 +2,23 @@ export default class ColumnChart {
     element = document.createElement('div');
 
 
-    data = [];
+    dataProp = [];
     maxHeight = 0;
     colHgtUnit = 1;
     chartHeight = 50;
     
+    set data(arr) {
+      this.maxHeight = Math.max(...arr);
+      this.colHgtUnit = this.chartHeight / this.maxHeight;
+      this.dataProp = arr;
+    }
+
+    get data() {
+      return this.dataProp;
+    }
 
     constructor(options) {
-      this.data = options?.data ? options.data : this.data;      
-      this.maxHeight = Math.max(...this.data);
-      this.colHgtUnit = this.chartHeight / this.maxHeight;
-
+      this.data = options?.data ? options.data : this.data;
       this.render(options);    
     }
 
@@ -50,7 +56,6 @@ export default class ColumnChart {
     }
       
     update(newdata) {
-      this.destroy();
       this.data = newdata;
       this.render();    
     }
