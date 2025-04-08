@@ -79,9 +79,10 @@ export default class RangePicker {
         this.renderMonth(this.rangePickers[1], new Date(this.rightPicker)); 
         this.createListeners();   
       }
+      else if(document.getElementsByClassName('rangepicker_open').length === 0) {
+        this.element.classList.add('rangepicker_open');
+      }
       else {
-        this.destroyListeners
-        el.innerHTML = '';
         this.element.classList.remove('rangepicker_open');
       }                                                                   
     }.bind(this);
@@ -92,8 +93,11 @@ export default class RangePicker {
       currentDt.setDate(1);
       while (currentDt.getMonth() === currentMth) {
         let selClass = '';
-        if(currentDt.toJSON() === this.from.toJSON() || currentDt.toJSON() === this.to.toJSON()) {
-          selClass = ' rangepicker__selected';
+        if(currentDt.toJSON() === this.from.toJSON()) {
+          selClass = ' rangepicker__selected-from';
+        }
+        else if(currentDt.toJSON() === this.to.toJSON()) {
+          selClass = ' rangepicker__selected-to';
         }
         else if(currentDt < this.to && currentDt > this.from) {
           selClass = ' rangepicker__selected-between';
@@ -132,13 +136,10 @@ export default class RangePicker {
       this.clickCnt = (this.clickCnt + 1) % 2;
 
       if (this.clickCnt === 1) {
-        const selectedCells = this.element.getElementsByClassName('rangepicker__selected-between');
-        const k = selectedCells.length;
-        for (let i = 0; i < k; i++) {
-          selectedCells[0].classList.remove('rangepicker__selected-between');
+        const allCells = this.element.getElementsByClassName('rangepicker__cell');
+        for (let i = 0; i < allCells.length; i++) { //reset classes
+          allCells[i].className = 'rangepicker__cell';
         }
-        this.element.getElementsByClassName('rangepicker__selected')[0]?.classList.remove('rangepicker__selected');
-        this.element.getElementsByClassName('rangepicker__selected')[0]?.classList.remove('rangepicker__selected');
         this.setFrom = new Date(event.target.dataset.value);
         this.setTo = null;
         event.target.classList.add('rangepicker__selected');
@@ -153,7 +154,8 @@ export default class RangePicker {
             this.element.querySelector(`[data-value='${dt1.toJSON()}']`)?.classList.add('rangepicker__selected-between');
             dt1.setDate(dt1.getDate() + 1);
           } while (dt1 < dt2);
-          event.target.classList.add('rangepicker__selected');
+          this.element.getElementsByClassName('rangepicker__selected')[0].classList.add('rangepicker__selected-from');
+          event.target.classList.add('rangepicker__selected-to');
         }
         else if (dt1 > dt2) {
           this.setFrom = new Date(dt2);
@@ -163,10 +165,13 @@ export default class RangePicker {
             this.element.querySelector(`[data-value='${dt2.toJSON()}']`)?.classList.add('rangepicker__selected-between');
             dt2.setDate(dt2.getDate() + 1);
           } while (dt2 < dt1);
-          event.target.classList.add('rangepicker__selected');
+          event.target.classList.add('rangepicker__selected-from');
+          this.element.getElementsByClassName('rangepicker__selected')[0].classList.add('rangepicker__selected-to');
         }
         else {
           this.setTo = new Date(this.from);
+          event.target.classList.add('rangepicker__selected-from');
+          event.target.classList.add('rangepicker__selected-to');
         }
         this.element.dispatchEvent(new Event('date-select'));
       }
@@ -181,6 +186,9 @@ export default class RangePicker {
       this.element.remove();
     }
     destroy() {
+      if(this.element.querySelector('[data-element=\'selector\']').innerHTML != '') {
+        this.destroyListeners();
+      }
       this.element.querySelector('[data-element=\'input\']').removeEventListener('click', this.renderRP);
       this.remove();
     }
