@@ -1,5 +1,6 @@
 export default class RangePicker {
     element = document.createElement('div');
+    selDate;
     from; to; rangePickers;
     set setFrom(dt) {
       this.from = dt;
@@ -7,7 +8,7 @@ export default class RangePicker {
     }
     set setTo(dt) {
       this.to = dt;
-      this.element.querySelector('[data-element=\'to\']').textContent = dt ? dt.toLocaleDateString('ru-RU') : '';
+      this.element.querySelector('[data-element=\'to\']').textContent = dt.toLocaleDateString('ru-RU');
     }    
     monthArr = ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'];
     clickCnt = 0;
@@ -93,10 +94,10 @@ export default class RangePicker {
       currentDt.setDate(1);
       while (currentDt.getMonth() === currentMth) {
         let selClass = '';
-        if(currentDt.toJSON() === this.from.toJSON()) {
+        if(currentDt.toJSON() === this.from?.toJSON()) {
           selClass = ' rangepicker__selected-from';
         }
-        else if(currentDt.toJSON() === this.to.toJSON()) {
+        else if(currentDt.toJSON() === this.to?.toJSON()) {
           selClass = ' rangepicker__selected-to';
         }
         else if(currentDt < this.to && currentDt > this.from) {
@@ -140,21 +141,21 @@ export default class RangePicker {
         for (let i = 0; i < allCells.length; i++) { //reset classes
           allCells[i].className = 'rangepicker__cell';
         }
-        this.setFrom = new Date(event.target.dataset.value);
-        this.setTo = null;
+        this.selDate = new Date(event.target.dataset.value);
         event.target.classList.add('rangepicker__selected');
       }
       else {
-        const dt1 = new Date(this.from);
+        const dt1 = new Date(this.selDate);
         const dt2 = new Date(event.target.dataset.value);
         if (dt1 < dt2) {
+          this.setFrom = new Date(dt1);
           this.setTo = new Date(dt2);
           dt1.setDate(dt1.getDate() + 1);
           do {
             this.element.querySelector(`[data-value='${dt1.toJSON()}']`)?.classList.add('rangepicker__selected-between');
             dt1.setDate(dt1.getDate() + 1);
           } while (dt1 < dt2);
-          this.element.getElementsByClassName('rangepicker__selected')[0].classList.add('rangepicker__selected-from');
+          this.element.getElementsByClassName('rangepicker__selected')[0]?.classList.add('rangepicker__selected-from');
           event.target.classList.add('rangepicker__selected-to');
         }
         else if (dt1 > dt2) {
@@ -166,10 +167,11 @@ export default class RangePicker {
             dt2.setDate(dt2.getDate() + 1);
           } while (dt2 < dt1);
           event.target.classList.add('rangepicker__selected-from');
-          this.element.getElementsByClassName('rangepicker__selected')[0].classList.add('rangepicker__selected-to');
+          this.element.getElementsByClassName('rangepicker__selected')[0]?.classList.add('rangepicker__selected-to');
         }
         else {
-          this.setTo = new Date(this.from);
+          this.setFrom = new Date(this.selDate);
+          this.setTo = new Date(this.selDate);
           event.target.classList.add('rangepicker__selected-from');
           event.target.classList.add('rangepicker__selected-to');
         }
