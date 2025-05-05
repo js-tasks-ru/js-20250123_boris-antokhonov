@@ -17,6 +17,7 @@ export default class ProductForm extends ProductFormv1 {
     const imageList = this.element.querySelector('#imageList');
     this.sortableList = new SortableList({items: Array.from(imageList.children)});
     imageList.remove();
-    this.element.querySelector('[data-element=\'imageListContainer\']').append(this.sortableList.element);   
+    this.element.querySelector('[data-element=\'imageListContainer\']').append(this.sortableList.element);
+    return this.element;
   }
 }

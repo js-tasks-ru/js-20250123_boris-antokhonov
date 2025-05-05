@@ -1,7 +1,7 @@
 export default class SortableList {
     element = '';
-    ptrScreenX = 0;
-    ptrScreenY = 0;
+    grabScreenX = 0;
+    grabScreenY = 0;
     listScreenY = 0;
     deleteIcons = {};
     grabIcons = {};
@@ -16,10 +16,8 @@ export default class SortableList {
       this.deleteIcons.forEach((el) => el.addEventListener('pointerdown', this.deleteElem));
       this.grabIcons = this.element.querySelectorAll('[data-grab-handle=\'\']');
       this.grabIcons.forEach((el) => el.addEventListener('pointerdown', this.grabElem));
+      this.grabIcons.forEach((el) => el.addEventListener('dragstart', (e) => e.preventDefault()));
       document.addEventListener('pointerup', this.releaseElem);
-      document.addEventListener("load", function(e) {
-        this.listScreenY = this.calcListScreenY(this.element);
-      });
     }
 
     deleteElem = function(e) {
@@ -28,6 +26,9 @@ export default class SortableList {
     };
 
     grabElem = function(event) {
+      if (this.listScreenY === 0) {
+        this.listScreenY = this.calcListScreenY(this.element);
+      }
       const currElem = event.currentTarget.closest('li');
       const placeHold = document.createElement('div');
       placeHold.className = 'sortable-list__placeholder';
@@ -35,8 +36,8 @@ export default class SortableList {
       currElem.after(placeHold);
       currElem.classList.add('sortable-list__item_dragging');
       currElem.style = 'width: 800px; height: 60px;';
-      this.ptrScreenX = event.screenX;
-      this.ptrScreenY = event.screenY;
+      this.grabScreenX = event.screenX;
+      this.grabScreenY = event.screenY;
       document.addEventListener('pointermove', this.updatePostn);
     }.bind(this);
 
@@ -52,9 +53,9 @@ export default class SortableList {
 
     updatePostn = function(event) {
       const currElem = document.querySelector('.sortable-list__item_dragging');
-      currElem.style = `width: 800px; height: 60px; left: ${currElem.offsetLeft + event.screenX - this.ptrScreenX}px; top: ${currElem.offsetTop + event.screenY - this.ptrScreenY}px;`;
-      this.ptrScreenX = event.screenX;
-      this.ptrScreenY = event.screenY;
+      currElem.style = `width: 800px; height: 60px; left: ${currElem.offsetLeft + event.screenX - this.grabScreenX}px; top: ${currElem.offsetTop + event.screenY - this.grabScreenY}px;`;
+      this.grabScreenX = event.screenX;
+      this.grabScreenY = event.screenY;
       if (currElem.offsetTop - this.listScreenY > currElem.nextSibling?.nextSibling?.offsetTop) {
         currElem.before(currElem.nextSibling.nextSibling);
       }
@@ -75,7 +76,7 @@ export default class SortableList {
     destroy() {
       this.deleteIcons.forEach((el) => el.removeEventListener('pointerdown', this.deleteElem));
       this.grabIcons.forEach((el) => el.removeEventListener('pointerdown', this.grabElem));
-      document.removeEventListener('pointerup', this.releaseElem);
+      this.grabIcons.forEach((el) => el.removeEventListener('pointerup', this.releaseElem));
       this.remove();
     }
 
