@@ -9,7 +9,9 @@ export default class SortableTable extends SortableTablev1 {
   constructor(headerConfig, {data = [], sorted = {}} = {}) {
     super(headerConfig, data);
     this.arrowEl = this.createArrowElement();
-    this.sort(sorted.id, sorted.order);
+    if (sorted.id) {
+      this.sort(sorted.id, sorted.order);
+    }
 
     this.sortableArr = this.element.querySelectorAll('[data-sortable=\'true\']');
     this.sortableArr.forEach(function(el) {
@@ -28,11 +30,7 @@ export default class SortableTable extends SortableTablev1 {
   }  
 
   sort(col, order = 'asc') {
-    if (this.isSortLocally) {
-      super.sort(col, order);
-    } else {
-      this.sortOnServer();
-    }
+    super.sort(col, order);
     if (this.sortedCol.dataset) {
       this.sortedCol.dataset.order = '';
     }
@@ -40,8 +38,6 @@ export default class SortableTable extends SortableTablev1 {
     this.sortedCol.dataset.order = order;
     this.sortedCol.append(this.arrowEl);    
   }
-  
-  sortOnServer() {}
 
   sortHandler = function(e) {
     this.sort(e.currentTarget.dataset.id, e.currentTarget.dataset.order === 'desc' ? 'asc' : 'desc');
